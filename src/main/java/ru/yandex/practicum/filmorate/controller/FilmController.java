@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -21,7 +22,7 @@ public class FilmController extends AbstractController<Film> {
     }
 
     @PostMapping("/films")
-    public Film addFilm(@RequestBody Film film) throws ValidationException {
+    public Film addFilm(@Valid @RequestBody Film film) throws ValidationException {
         if (film.getId() != null) {
             log.info("Запрос на обновление информации по существующему фильму в методе POST не корректен.");
             return null;
@@ -31,7 +32,7 @@ public class FilmController extends AbstractController<Film> {
     }
 
     @PutMapping("/films")
-    public Film updateFilm(@RequestBody Film film) throws ValidationException {
+    public Film updateFilm(@Valid @RequestBody Film film) throws ValidationException {
         if (film.getId() == null) {
             log.info("Запрос на создание нового фильма в методе PUT не корректен.");
             return null;
@@ -40,6 +41,7 @@ public class FilmController extends AbstractController<Film> {
         return updateItem(film);
     }
 
+    @Override
     void validate(Film film) throws ValidationException {
         if (film.getName() == null || film.getName().isBlank()) {
             log.info("Поле 'name' пустое: {}", film.getName());

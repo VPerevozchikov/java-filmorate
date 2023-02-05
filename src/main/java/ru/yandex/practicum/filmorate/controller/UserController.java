@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -20,7 +21,7 @@ public class UserController extends AbstractController<User> {
     }
 
     @PostMapping("/users")
-    public User addUser(@RequestBody User user) throws ValidationException {
+    public User addUser(@Valid @RequestBody User user) throws ValidationException {
         if (user.getId() != null) {
             log.info("Запрос на обновление информации по существующему пользователю в методе POST не корректен.");
             return null;
@@ -30,7 +31,7 @@ public class UserController extends AbstractController<User> {
     }
 
     @PutMapping("/users")
-    public User updateUser(@RequestBody User user) throws ValidationException {
+    public User updateUser(@Valid @RequestBody User user) throws ValidationException {
         if (user.getId() == null) {
             log.info("Запрос на создание нового пользователя в методе PUT не корректен.");
             return null;
@@ -39,6 +40,7 @@ public class UserController extends AbstractController<User> {
         return updateItem(user);
     }
 
+    @Override
     void validate(User user) throws ValidationException {
         if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
             log.info("Ошибка в email{}: ", user.getEmail());

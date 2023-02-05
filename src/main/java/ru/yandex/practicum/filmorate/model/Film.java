@@ -22,7 +22,6 @@ public class Film extends AbstractModel {
     @Size(min = 1, max = 200)
     private String description;
     @NotNull
-    @NotBlank
     private LocalDate releaseDate;
     @Min(1)
     private int duration;
