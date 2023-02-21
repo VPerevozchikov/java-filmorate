@@ -9,6 +9,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -24,10 +26,11 @@ public class User extends AbstractModel {
     private String name;
     @NotNull
     private LocalDate birthday;
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public User(Integer id, String email, String login, String name, String birthday) {
-        this.id = id;
+    public Set<Long> listOfFriends = new HashSet<>();
+
+    public User(String email, String login, String name, String birthday) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         this.email = email;
         this.login = login;
         this.name = name;

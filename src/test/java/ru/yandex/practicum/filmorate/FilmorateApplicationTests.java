@@ -1,3 +1,4 @@
+
 package ru.yandex.practicum.filmorate;
 
 import org.junit.jupiter.api.Test;
@@ -8,6 +9,10 @@ import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.util.List;
 
@@ -22,10 +27,11 @@ class FilmorateApplicationTests {
 
     @Test
     void shouldCreateUser() throws ValidationException {
-        User user = new User(null, "test@test.ru",
+        User user = new User("test@test.ru",
                 "testLogin", "testName", "1990-01-01");
-
-        UserController userController = new UserController();
+        UserController userController = new UserController(
+                new UserService(
+                        new InMemoryUserStorage()));
 
         User userAfterAdd = userController.addUser(user);
         final List<User> users = userController.getUsers();
@@ -35,16 +41,19 @@ class FilmorateApplicationTests {
         assertEquals(userAfterAdd.getId(), 1, "ID пользователей не совпадают.");
     }
 
+
     @Test
-    void shouldThrowValidateExceptionOnBadEmailUser() throws ValidationException {
+    void shouldThrowValidateExceptionOnBadEmailUser() {
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 new Executable() {
                     @Override
                     public void execute() throws ValidationException {
-                        User user = new User(null, "test.ru",
+                        User user = new User("test.ru",
                                 "testLogin", "testName", "1990-01-01");
-                        UserController userController = new UserController();
+                        UserController userController = new UserController(
+                                new UserService(
+                                        new InMemoryUserStorage()));
                         userController.addUser(user);
                     }
                 });
@@ -52,10 +61,12 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    void shouldNotCreateUserWithBadEmailUser() throws ValidationException {
-        User user = new User(null, "test.ru",
+    void shouldNotCreateUserWithBadEmailUser() {
+        User user = new User("test.ru",
                 "testLogin", "testName", "1990-01-01");
-        UserController userController = new UserController();
+        UserController userController = new UserController(
+                new UserService(
+                        new InMemoryUserStorage()));
         try {
             userController.addUser(user);
         } catch (ValidationException e) {
@@ -66,15 +77,17 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    void shouldThrowValidateExceptionOnEmptyEmailUser() throws ValidationException {
+    void shouldThrowValidateExceptionOnEmptyEmailUser() {
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 new Executable() {
                     @Override
                     public void execute() throws ValidationException {
-                        User user = new User(null, "",
+                        User user = new User("",
                                 "testLogin", "testName", "1990-01-01");
-                        UserController userController = new UserController();
+                        UserController userController = new UserController(
+                                new UserService(
+                                        new InMemoryUserStorage()));
                         userController.addUser(user);
                     }
                 });
@@ -82,10 +95,12 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    void shouldNotCreateUserWithEmptyEmailUser() throws ValidationException {
-        User user = new User(null, null,
+    void shouldNotCreateUserWithEmptyEmailUser() {
+        User user = new User(null,
                 "testLogin", "testName", "1990-01-01");
-        UserController userController = new UserController();
+        UserController userController = new UserController(
+                new UserService(
+                        new InMemoryUserStorage()));
         try {
             userController.addUser(user);
         } catch (ValidationException e) {
@@ -96,15 +111,17 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    void shouldThrowValidateExceptionOnNullEmailUser() throws ValidationException {
+    void shouldThrowValidateExceptionOnNullEmailUser() {
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 new Executable() {
                     @Override
                     public void execute() throws ValidationException {
-                        User user = new User(null, null,
+                        User user = new User(null,
                                 "testLogin", "testName", "1990-01-01");
-                        UserController userController = new UserController();
+                        UserController userController = new UserController(
+                                new UserService(
+                                        new InMemoryUserStorage()));
                         userController.addUser(user);
                     }
                 });
@@ -112,10 +129,12 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    void shouldNotCreateUserWithNullEmailUser() throws ValidationException {
-        User user = new User(null, "",
+    void shouldNotCreateUserWithNullEmailUser() {
+        User user = new User("",
                 "testLogin", "testName", "1990-01-01");
-        UserController userController = new UserController();
+        UserController userController = new UserController(
+                new UserService(
+                        new InMemoryUserStorage()));
         try {
             userController.addUser(user);
         } catch (ValidationException e) {
@@ -126,15 +145,17 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    void shouldThrowValidateExceptionOnEmptyLoginUser() throws ValidationException {
+    void shouldThrowValidateExceptionOnEmptyLoginUser() {
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 new Executable() {
                     @Override
                     public void execute() throws ValidationException {
-                        User user = new User(null, "test@test.ru",
+                        User user = new User("test@test.ru",
                                 "", "testName", "1990-01-01");
-                        UserController userController = new UserController();
+                        UserController userController = new UserController(
+                                new UserService(
+                                        new InMemoryUserStorage()));
                         userController.addUser(user);
                     }
                 });
@@ -142,10 +163,12 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    void shouldNotCreateUserWithEmptyLoginUser() throws ValidationException {
-        User user = new User(null, "test@test.ru",
+    void shouldNotCreateUserWithEmptyLoginUser() {
+        User user = new User("test@test.ru",
                 "", "testName", "1990-01-01");
-        UserController userController = new UserController();
+        UserController userController = new UserController(
+                new UserService(
+                        new InMemoryUserStorage()));
         try {
             userController.addUser(user);
         } catch (ValidationException e) {
@@ -156,15 +179,17 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    void shouldThrowValidateExceptionOnBadLoginUser() throws ValidationException {
+    void shouldThrowValidateExceptionOnBadLoginUser() {
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 new Executable() {
                     @Override
                     public void execute() throws ValidationException {
-                        User user = new User(null, "test@test.ru",
+                        User user = new User("test@test.ru",
                                 "test test", "testName", "1990-01-01");
-                        UserController userController = new UserController();
+                        UserController userController = new UserController(
+                                new UserService(
+                                        new InMemoryUserStorage()));
                         userController.addUser(user);
                     }
                 });
@@ -172,10 +197,12 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    void shouldNotCreateUserWithBadLoginUser() throws ValidationException {
-        User user = new User(null, "test@test.ru",
+    void shouldNotCreateUserWithBadLoginUser() {
+        User user = new User("test@test.ru",
                 "test test", "testName", "1990-01-01");
-        UserController userController = new UserController();
+        UserController userController = new UserController(
+                new UserService(
+                        new InMemoryUserStorage()));
         try {
             userController.addUser(user);
         } catch (ValidationException e) {
@@ -186,15 +213,17 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    void shouldThrowValidateExceptionOnNullLoginUser() throws ValidationException {
+    void shouldThrowValidateExceptionOnNullLoginUser() {
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 new Executable() {
                     @Override
                     public void execute() throws ValidationException {
-                        User user = new User(null, "test@test.ru",
+                        User user = new User("test@test.ru",
                                 null, "testName", "1990-01-01");
-                        UserController userController = new UserController();
+                        UserController userController = new UserController(
+                                new UserService(
+                                        new InMemoryUserStorage()));
                         userController.addUser(user);
                     }
                 });
@@ -202,10 +231,12 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    void shouldNotCreateUserWithNullLoginUser() throws ValidationException {
-        User user = new User(null, "test@test.ru",
+    void shouldNotCreateUserWithNullLoginUser() {
+        User user = new User("test@test.ru",
                 null, "testName", "1990-01-01");
-        UserController userController = new UserController();
+        UserController userController = new UserController(
+                new UserService(
+                        new InMemoryUserStorage()));
         try {
             userController.addUser(user);
         } catch (ValidationException e) {
@@ -218,9 +249,11 @@ class FilmorateApplicationTests {
 
     @Test
     void shouldEnterLoginInFieldNameUser() throws ValidationException {
-        User user = new User(null, "test@test.ru",
+        User user = new User( "test@test.ru",
                 "testLogin", " ", "1990-01-01");
-        UserController userController = new UserController();
+        UserController userController = new UserController(
+                new UserService(
+                        new InMemoryUserStorage()));
 
         User userAfterAdd = userController.addUser(user);
 
@@ -233,15 +266,17 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    void shouldThrowValidateExceptionOnBadBirthdayUser() throws ValidationException {
+    void shouldThrowValidateExceptionOnBadBirthdayUser() {
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 new Executable() {
                     @Override
                     public void execute() throws ValidationException {
-                        User user = new User(null, "test@test.ru",
+                        User user = new User( "test@test.ru",
                                 "testLogin", "testName", "2030-01-01");
-                        UserController userController = new UserController();
+                        UserController userController = new UserController(
+                                new UserService(
+                                        new InMemoryUserStorage()));
                         userController.addUser(user);
                     }
                 });
@@ -249,10 +284,12 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    void shouldNotCreateUserWithBadBirthdayUser() throws ValidationException {
-        User user = new User(null, "test@test.ru",
+    void shouldNotCreateUserWithBadBirthdayUser() {
+        User user = new User("test@test.ru",
                 "testLogin", "testName", "2030-01-01");
-        UserController userController = new UserController();
+        UserController userController = new UserController(
+                new UserService(
+                        new InMemoryUserStorage()));
         try {
             userController.addUser(user);
         } catch (ValidationException e) {
@@ -270,9 +307,11 @@ class FilmorateApplicationTests {
 
     @Test
     void shouldCreateFilm() throws ValidationException {
-        Film film = new Film(null, "testName",
+        Film film = new Film("testName",
                 "testDescription", "2000-01-01", 90);
-        FilmController filmController = new FilmController();
+        FilmController filmController = new FilmController(
+                new FilmService(
+                        new InMemoryFilmStorage(), new InMemoryUserStorage()));
 
         Film filmAfterAdd = filmController.addFilm(film);
         final List<Film> films = filmController.getFilms();
@@ -283,15 +322,17 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    void shouldThrowValidateExceptionOnEmptyNameFilm() throws ValidationException {
+    void shouldThrowValidateExceptionOnEmptyNameFilm() {
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 new Executable() {
                     @Override
                     public void execute() throws ValidationException {
-                        Film film = new Film(null, " ",
+                        Film film = new Film(" ",
                                 "testDescription", "2000-01-01", 90);
-                        FilmController filmController = new FilmController();
+                        FilmController filmController = new FilmController(
+                                new FilmService(
+                                        new InMemoryFilmStorage(), new InMemoryUserStorage()));
 
                         filmController.addFilm(film);
                     }
@@ -300,10 +341,12 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    void shouldNotCreateFilmWithEmptyNameFilm() throws ValidationException {
-        Film film = new Film(null, " ",
+    void shouldNotCreateFilmWithEmptyNameFilm() {
+        Film film = new Film(" ",
                 "testDescription", "2000-01-01", 90);
-        FilmController filmController = new FilmController();
+        FilmController filmController = new FilmController(
+                new FilmService(
+                        new InMemoryFilmStorage(), new InMemoryUserStorage()));
         try {
             filmController.addFilm(film);
         } catch (ValidationException e) {
@@ -314,15 +357,17 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    void shouldThrowValidateExceptionOnNullNameFilm() throws ValidationException {
+    void shouldThrowValidateExceptionOnNullNameFilm() {
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 new Executable() {
                     @Override
                     public void execute() throws ValidationException {
-                        Film film = new Film(null, null,
+                        Film film = new Film(null,
                                 "testDescription", "2000-01-01", 90);
-                        FilmController filmController = new FilmController();
+                        FilmController filmController = new FilmController(
+                                new FilmService(
+                                        new InMemoryFilmStorage(), new InMemoryUserStorage()));
 
                         filmController.addFilm(film);
                     }
@@ -331,10 +376,12 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    void shouldNotCreateFilmWithNullNameFilm() throws ValidationException {
-        Film film = new Film(null, null,
+    void shouldNotCreateFilmWithNullNameFilm() {
+        Film film = new Film(null,
                 "testDescription", "2000-01-01", 90);
-        FilmController filmController = new FilmController();
+        FilmController filmController = new FilmController(
+                new FilmService(
+                        new InMemoryFilmStorage(), new InMemoryUserStorage()));
         try {
             filmController.addFilm(film);
         } catch (ValidationException e) {
@@ -345,37 +392,42 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    void shouldThrowValidateExceptionOnOverLongDescription() throws ValidationException {
+    void shouldThrowValidateExceptionOnOverLongDescription() {
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 new Executable() {
                     @Override
                     public void execute() throws ValidationException {
-                        Film film = new Film(null, "testName",
+                        Film film = new Film("testName",
                                 "0123456789" + "0123456789" + "0123456789" + "0123456789" + "0123456789"
                                         + "0123456789" + "0123456789" + "0123456789" + "0123456789" + "0123456789"
                                         + "0123456789" + "0123456789" + "0123456789" + "0123456789" + "0123456789"
                                         + "0123456789" + "0123456789" + "0123456789" + "0123456789" + "0123456789"
                                         + "0",
                                 "2000-01-01", 90);
-                        FilmController filmController = new FilmController();
+                        FilmController filmController = new FilmController(
+                                new FilmService(
+                                        new InMemoryFilmStorage(), new InMemoryUserStorage()));
 
                         filmController.addFilm(film);
                     }
                 });
-        assertEquals("Ошибка в описании фильма. Описание пустое или слишком длинное.", exception.getMessage());
+        assertEquals("Ошибка в описании фильма. Описание пустое или слишком длинное.",
+                exception.getMessage());
     }
 
     @Test
-    void shouldNotCreateFilmWithOverLongDescription() throws ValidationException {
-        Film film = new Film(null, "testName",
+    void shouldNotCreateFilmWithOverLongDescription() {
+        Film film = new Film("testName",
                 "0123456789" + "0123456789" + "0123456789" + "0123456789" + "0123456789"
                         + "0123456789" + "0123456789" + "0123456789" + "0123456789" + "0123456789"
                         + "0123456789" + "0123456789" + "0123456789" + "0123456789" + "0123456789"
                         + "0123456789" + "0123456789" + "0123456789" + "0123456789" + "0123456789"
                         + "0",
                 "2000-01-01", 90);
-        FilmController filmController = new FilmController();
+        FilmController filmController = new FilmController(
+                new FilmService(
+                        new InMemoryFilmStorage(), new InMemoryUserStorage()));
         try {
             filmController.addFilm(film);
         } catch (ValidationException e) {
@@ -386,14 +438,16 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    void shouldNotCreateFilmWithMaxLongDescription() throws ValidationException {
-        Film film = new Film(null, "testName",
+    void shouldNotCreateFilmWithMaxLongDescription() {
+        Film film = new Film("testName",
                 "0123456789" + "0123456789" + "0123456789" + "0123456789" + "0123456789"
                         + "0123456789" + "0123456789" + "0123456789" + "0123456789" + "0123456789"
                         + "0123456789" + "0123456789" + "0123456789" + "0123456789" + "0123456789"
                         + "0123456789" + "0123456789" + "0123456789" + "0123456789" + "0123456789",
                 "2000-01-01", 90);
-        FilmController filmController = new FilmController();
+        FilmController filmController = new FilmController(
+                new FilmService(
+                        new InMemoryFilmStorage(), new InMemoryUserStorage()));
         try {
             filmController.addFilm(film);
         } catch (ValidationException e) {
@@ -404,16 +458,18 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    void shouldThrowValidateExceptionOnNullDescription() throws ValidationException {
+    void shouldThrowValidateExceptionOnNullDescription() {
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 new Executable() {
                     @Override
                     public void execute() throws ValidationException {
-                        Film film = new Film(null, "testName",
+                        Film film = new Film("testName",
                                 null,
                                 "2000-01-01", 90);
-                        FilmController filmController = new FilmController();
+                        FilmController filmController = new FilmController(
+                                new FilmService(
+                                        new InMemoryFilmStorage(), new InMemoryUserStorage()));
 
                         filmController.addFilm(film);
                     }
@@ -422,11 +478,13 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    void shouldNotCreateFilmWithNullDescription() throws ValidationException {
-        Film film = new Film(null, "testName",
+    void shouldNotCreateFilmWithNullDescription() {
+        Film film = new Film("testName",
                 null,
                 "2000-01-01", 90);
-        FilmController filmController = new FilmController();
+        FilmController filmController = new FilmController(
+                new FilmService(
+                        new InMemoryFilmStorage(), new InMemoryUserStorage()));
         try {
             filmController.addFilm(film);
         } catch (ValidationException e) {
@@ -437,16 +495,18 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    void shouldThrowValidateExceptionOnOverEarlyDateRelease() throws ValidationException {
+    void shouldThrowValidateExceptionOnOverEarlyDateRelease() {
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 new Executable() {
                     @Override
                     public void execute() throws ValidationException {
-                        Film film = new Film(null, "testName",
+                        Film film = new Film("testName",
                                 "testDescription",
                                 "1895-12-27", 90);
-                        FilmController filmController = new FilmController();
+                        FilmController filmController = new FilmController(
+                                new FilmService(
+                                        new InMemoryFilmStorage(), new InMemoryUserStorage()));
 
                         filmController.addFilm(film);
                     }
@@ -455,11 +515,13 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    void shouldNotCreateFilmWithOverEarlyDateRelease() throws ValidationException {
-        Film film = new Film(null, "testName",
+    void shouldNotCreateFilmWithOverEarlyDateRelease() {
+        Film film = new Film("testName",
                 "testDescription",
                 "1895-12-27", 90);
-        FilmController filmController = new FilmController();
+        FilmController filmController = new FilmController(
+                new FilmService(
+                        new InMemoryFilmStorage(), new InMemoryUserStorage()));
         try {
             filmController.addFilm(film);
         } catch (ValidationException e) {
@@ -470,11 +532,13 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    void shouldCreateFilmWithMaxEarlyDateRelease() throws ValidationException {
-        Film film = new Film(null, "testName",
+    void shouldCreateFilmWithMaxEarlyDateRelease() {
+        Film film = new Film("testName",
                 "testDescription",
                 "1895-12-28", 90);
-        FilmController filmController = new FilmController();
+        FilmController filmController = new FilmController(
+                new FilmService(
+                        new InMemoryFilmStorage(), new InMemoryUserStorage()));
         try {
             filmController.addFilm(film);
         } catch (ValidationException e) {
@@ -486,15 +550,17 @@ class FilmorateApplicationTests {
 
     @Test
     void shouldThrowNullPointerExceptionOnNullDateRelease() throws NullPointerException {
-        final NullPointerException exception = assertThrows(
+        assertThrows(
                 NullPointerException.class,
                 new Executable() {
                     @Override
                     public void execute() throws ValidationException {
-                        Film film = new Film(null, "testName",
+                        Film film = new Film("testName",
                                 "testDescription",
                                 null, 90);
-                        FilmController filmController = new FilmController();
+                        FilmController filmController = new FilmController(
+                                new FilmService(
+                                        new InMemoryFilmStorage(), new InMemoryUserStorage()));
 
                         filmController.addFilm(film);
                     }
@@ -502,11 +568,13 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    void shouldNotCreateFilmWithZeroDuration() throws ValidationException {
-        Film film = new Film(null, "testName",
+    void shouldNotCreateFilmWithZeroDuration() {
+        Film film = new Film("testName",
                 "testDescription",
                 "2000-01-01", 0);
-        FilmController filmController = new FilmController();
+        FilmController filmController = new FilmController(
+                new FilmService(
+                        new InMemoryFilmStorage(), new InMemoryUserStorage()));
         try {
             filmController.addFilm(film);
         } catch (ValidationException e) {
@@ -517,11 +585,13 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    void shouldCreateFilmWithZeroDuration() throws ValidationException {
-        Film film = new Film(null, "testName",
+    void shouldCreateFilmWithZeroDuration() {
+        Film film = new Film("testName",
                 "testDescription",
                 "2000-01-01", 0);
-        FilmController filmController = new FilmController();
+        FilmController filmController = new FilmController(
+                new FilmService(
+                        new InMemoryFilmStorage(), new InMemoryUserStorage()));
         try {
             filmController.addFilm(film);
         } catch (ValidationException e) {
@@ -532,11 +602,13 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    void shouldNotCreateFilmWithNegativeDuration() throws ValidationException {
-        Film film = new Film(null, "testName",
+    void shouldNotCreateFilmWithNegativeDuration() {
+        Film film = new Film("testName",
                 "testDescription",
                 "2000-01-01", 0);
-        FilmController filmController = new FilmController();
+        FilmController filmController = new FilmController(
+                new FilmService(
+                        new InMemoryFilmStorage(), new InMemoryUserStorage()));
         try {
             filmController.addFilm(film);
         } catch (ValidationException e) {
@@ -547,11 +619,13 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    void shouldCreateFilmWithNegativeDuration() throws ValidationException {
-        Film film = new Film(null, "testName",
+    void shouldCreateFilmWithNegativeDuration() {
+        Film film = new Film("testName",
                 "testDescription",
                 "2000-01-01", 0);
-        FilmController filmController = new FilmController();
+        FilmController filmController = new FilmController(
+                new FilmService(
+                        new InMemoryFilmStorage(), new InMemoryUserStorage()));
         try {
             filmController.addFilm(film);
         } catch (ValidationException e) {
@@ -560,6 +634,4 @@ class FilmorateApplicationTests {
         final List<Film> films = filmController.getFilms();
         assertEquals(0, films.size(), "Неверное количество фильмов.");
     }
-
-
 }

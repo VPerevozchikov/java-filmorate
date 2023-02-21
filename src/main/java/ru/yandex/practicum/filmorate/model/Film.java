@@ -10,6 +10,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -26,10 +28,10 @@ public class Film extends AbstractModel {
     @Min(1)
     private int duration;
 
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    public Set<Long> listOfLikes = new HashSet<>();
 
-    public Film(Integer id, String name, String description, String releaseDate, int duration) {
-        this.id = id;
+    public Film(String name, String description, String releaseDate, int duration) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         this.name = name;
         this.description = description;
         this.releaseDate = LocalDate.parse(releaseDate, formatter);
