@@ -3,20 +3,16 @@ package ru.yandex.practicum.filmorate.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.IncorrectParameterException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
 public class FilmController {
-    public static final LocalDate FIRST_FILM = LocalDate.of(1895, 12, 28);
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
-
     private final FilmService filmService;
 
     public FilmController(FilmService filmService) {
@@ -56,9 +52,6 @@ public class FilmController {
     @GetMapping("/films/popular")
     public List<Film> getPopularFilms(@RequestParam(defaultValue = "10", required = false) Integer count) {
         log.info("Запрос на получение популярных фильмов в кол-ве: {}", count);
-        if (count <= 0) {
-            throw new IncorrectParameterException("count");
-        }
         return filmService.getPopularFilms(count);
     }
 

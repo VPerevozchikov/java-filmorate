@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.IncorrectParameterException;
 import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -13,7 +14,6 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -100,11 +100,15 @@ public class FilmService {
     }
 
     public List<Film> getPopularFilms(Integer count) {
-        FilmPopularComparator filmPopularComparator = new FilmPopularComparator();
-        return filmStorage.getFilms().values().stream()
-                .sorted(filmPopularComparator)
-                .limit(count)
-                .collect(Collectors.toList());
+        if (count > 0) {
+            FilmPopularComparator filmPopularComparator = new FilmPopularComparator();
+            return filmStorage.getFilms().values().stream()
+                    .sorted(filmPopularComparator)
+                    .limit(count)
+                    .collect(Collectors.toList());
+        } else {
+            throw new IncorrectParameterException("count");
+        }
     }
 
     void validate(Film film) throws ValidationException {
@@ -128,22 +132,6 @@ public class FilmService {
         if (film.getDuration() <= 0) {
             log.info("Поле 'duration' ноль или отрицательное число: {}", film.getDuration());
             throw new ValidationException("Продолжительность фильма отрицательная или ноль.");
-        }
-    }
-}
-
-class FilmPopularComparator implements Comparator<Film> {
-
-    @Override
-    public int compare(Film f1, Film f2) {
-        if (f1.listOfLikes.size() < f2.listOfLikes.size()) {
-            return 1;
-
-        } else if (f1.listOfLikes.size() > f2.listOfLikes.size()) {
-            return -1;
-
-        } else {
-            return 0;
         }
     }
 }
