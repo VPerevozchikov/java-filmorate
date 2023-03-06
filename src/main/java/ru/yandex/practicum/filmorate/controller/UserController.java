@@ -5,61 +5,65 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.List;
 
 @RestController
-public class UserController extends AbstractController<User> {
+public class UserController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping("/users")
-    public ArrayList getUsers() {
-        log.info("Количество пользователей в базе данных: {}", data.size());
-        return new ArrayList<>(data.values());
+    public List<User> getUsers() {
+        log.info("Количество пользователей в базе данных: {}", userService.getUsers().size());
+        return userService.getUsers();
     }
 
     @PostMapping("/users")
     public User addUser(@Valid @RequestBody User user) throws ValidationException {
-        if (user.getId() != null) {
-            log.info("Запрос на обновление информации по существующему пользователю в методе POST не корректен.");
-            return null;
-        }
         log.info("Запрос на создание пользователя: {}", user);
-        return createItem(user);
+        return userService.addUser(user);
     }
 
     @PutMapping("/users")
     public User updateUser(@Valid @RequestBody User user) throws ValidationException {
-        if (user.getId() == null) {
-            log.info("Запрос на создание нового пользователя в методе PUT не корректен.");
-            return null;
-        }
         log.info("Запрос на обновление данных пользователя: {}", user);
-        return updateItem(user);
+        return userService.updateUser(user);
     }
 
-    @Override
-    void validate(User user) throws ValidationException {
-        if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
-            log.info("Ошибка в email{}: ", user.getEmail());
-            throw new ValidationException("Ошибка в email.");
-        }
+    @PutMapping("/users/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable("id") Long id, @PathVariable("friendId") Long friendId) {
+        log.info("Запрос на добавление пользователя в друзья: {}", userService.getUserById(friendId));
+        userService.addFriend(id, friendId);
+    }
 
-        if (user.getLogin() == null || user.getLogin().isBlank() || user.getLogin().contains(" ")) {
-            log.info("Ошибка в логине пользователя: {}", user.getLogin());
-            throw new ValidationException("Ошибка в логине пользователя.");
-        }
+    @DeleteMapping("/users/{id}/friends/{friendId}")
+    public void deleteFriend(@PathVariable("id") Long id, @PathVariable("friendId") Long friendId) {
+        log.info("Запрос на удаление пользователя из друзей: {}", userService.getUserById(friendId));
+        userService.deleteFriend(id, friendId);
+    }
 
-        if (user.getName() == null || user.getName().isBlank() || user.getName().length() == 0) {
-            log.info("Поле 'name' пустое. В поле 'name' вставлены данные поля 'login': {}.", user.getLogin());
-            user.setName(user.getLogin());
-        }
+    @GetMapping("/users/{id}/friends")
+    public List<User> getListOfFriends(@PathVariable("id") Long id) {
+        log.info("Запрос на получение списка друзей пользователя: {}", userService.getUserById(id));
+        return userService.getListOfFriends(id);
+    }
 
-        if (user.getBirthday().isAfter(LocalDate.now())) {
-            log.info("Введенный день рождения {} является будущим временем, это не корректно", user.getBirthday());
-            throw new ValidationException("День рождения не может быть в будущем.");
-        }
+    @GetMapping("/users/{id}/friends/common/{otherId}")
+    public List<User> getListOfMutualFriends(@PathVariable("id") Long id, @PathVariable("otherId") Long otherId) {
+        log.info("Запрос на получение списка общих друзей пользователя: {}", userService.getUserById(id));
+        return userService.getListOfMutualFriends(id, otherId);
+    }
+
+    @GetMapping("/users/{userId}")
+    public User findUser(@PathVariable("userId") Long userId) {
+        log.info("Запрос на получение пользователя по id: {}", userId);
+        return userService.getUserById(userId);
     }
 }

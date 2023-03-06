@@ -5,64 +5,59 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.List;
 
 @RestController
-public class FilmController extends AbstractController<Film> {
-    public static final LocalDate FIRST_FILM = LocalDate.of(1895, 12, 28);
+public class FilmController {
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
+    private final FilmService filmService;
+
+    public FilmController(FilmService filmService) {
+        this.filmService = filmService;
+    }
 
     @GetMapping("/films")
-    public ArrayList getFilms() {
-        log.info("Количество фильмов в базе данных: {}", data.size());
-        return new ArrayList<>(data.values());
+    public List<Film> getFilms() {
+        log.info("Количество фильмов в базе данных: {}", filmService.getFilms().size());
+        return filmService.getFilms();
     }
 
     @PostMapping("/films")
     public Film addFilm(@Valid @RequestBody Film film) throws ValidationException {
-        if (film.getId() != null) {
-            log.info("Запрос на обновление информации по существующему фильму в методе POST не корректен.");
-            return null;
-        }
         log.info("Запрос на внесения фильма в базу: {}", film);
-        return createItem(film);
+        return filmService.addFilm(film);
     }
 
     @PutMapping("/films")
     public Film updateFilm(@Valid @RequestBody Film film) throws ValidationException {
-        if (film.getId() == null) {
-            log.info("Запрос на создание нового фильма в методе PUT не корректен.");
-            return null;
-        }
         log.info("Запрос на обновление данных фильма: {}", film);
-        return updateItem(film);
+        return filmService.updateFilm(film);
     }
 
-    @Override
-    void validate(Film film) throws ValidationException {
-        if (film.getName() == null || film.getName().isBlank()) {
-            log.info("Поле 'name' пустое: {}", film.getName());
-            throw new ValidationException("Ошибка в названии фильма.");
-        }
+    @PutMapping("/films/{id}/like/{userId}")
+    public void addLike(@PathVariable("id") Long id, @PathVariable("userId") Long userId) {
+        log.info("Запрос на добавление лайка к фильму: {}", filmService.getFilmById(id));
+        filmService.putLike(id, userId);
+    }
 
-        if (film.getDescription() == null
-                || film.getDescription().isBlank()
-                || film.getDescription().length() > 200) {
-            log.info("Поле 'description' пустое или кол-во символов превышает 200: {}", film.getDescription());
-            throw new ValidationException("Ошибка в описании фильма. Описание пустое или слишком длинное.");
-        }
+    @DeleteMapping("/films/{id}/like/{userId}")
+    public void deleteLike(@PathVariable("id") Long id, @PathVariable("userId") Long userId) {
+        log.info("Запрос на удаление лайка по фильму: {}", filmService.getFilmById(id));
+        filmService.deleteLike(id, userId);
+    }
 
-        if (film.getReleaseDate() == null || film.getReleaseDate().isBefore(FIRST_FILM)) {
-            log.info("В поле 'releaseDate' введена недопустимо ранняя дата: {}", film.getReleaseDate());
-            throw new ValidationException("Дата релиза не верна.");
-        }
+    @GetMapping("/films/popular")
+    public List<Film> getPopularFilms(@RequestParam(defaultValue = "10", required = false) Integer count) {
+        log.info("Запрос на получение популярных фильмов в кол-ве: {}", count);
+        return filmService.getPopularFilms(count);
+    }
 
-        if (film.getDuration() <= 0) {
-            log.info("Поле 'duration' ноль или отрицательное число: {}", film.getDuration());
-            throw new ValidationException("Продолжительность фильма отрицательная или ноль.");
-        }
+    @GetMapping("/films/{filmId}")
+    public Film findFilm(@PathVariable("filmId") Long filmId) {
+        log.info("Запрос на получение фильма по id: {}", filmId);
+        return filmService.getFilmById(filmId);
     }
 }
